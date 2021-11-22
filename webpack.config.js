@@ -1,6 +1,11 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader-v16/dist/plugin.js').default
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
+function resolve(dir) {
+  return path.join(__dirname, dir);
+}
+
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: path.resolve(__dirname, './src/index.js'),
@@ -50,6 +55,7 @@ module.exports = {
           },
         ],
       },
+      {test: /\.less$/, loader: 'style-loader!css-loader!less-loader'},
       {
         test: /\.(png|svg|jpg|gif)$/,
         use: ['file-loader'],
@@ -71,6 +77,21 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './index.html'),
     }),
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new CopyPlugin([
+        {
+            from: resolve('./node_modules/pdfjs-dist/cmaps'),
+            to:resolve('./dist/cmaps'),
+            toType: 'dir'
+        },
+        {
+            from:resolve('./node_modules/pdfjs-dist/build/pdf.sandbox.js')
+        },
+        {
+          from:resolve('./public'),
+          to: resolve('./dist'),
+          toType: 'dir'
+        }
+    ])
   ],
 };
